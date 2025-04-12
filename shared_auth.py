@@ -1,7 +1,7 @@
 import requests
 
-CLIENT_ID = 'ed11b3f1-7f7f-48d6-bcc5-91338efdf48a'
-CLIENT_SECRET = 'ahTUd7hT1S8tVm4LYYrPJJ4_HMazJOJGmfHV'
+CLIENT_ID = 'Client_ID'
+CLIENT_SECRET = 'Client_Key'
 
 def get_access_token():
     token_url = 'https://identity.nexar.com/connect/token'
