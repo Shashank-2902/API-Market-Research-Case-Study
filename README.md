@@ -36,15 +36,6 @@ To provide data-driven insights for suppliers, manufacturers, and consumers by t
 - ✅ Insights on vendor pricing strategies and availability dynamics
 - ✅ Reproducible and portable via Docker
 
-## 📊 Data Insights
-
-- Time Range: **Jan 7–20, 2025**
-- Highlighted Vendors: **Jameco**, **Mouser**, **id Electro**
-- Findings:
-  - Certain vendors maintain premium pricing with limited supply.
-  - Availability increases rapidly post-Jan 13.
-  - Most companies show consistent pricing behavior.
-
 ## 📁 Project Structure
 
 ```bash
