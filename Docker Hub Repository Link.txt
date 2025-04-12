@@ -1,0 +1,5 @@
+Docker Hub Repository Link:
+https://hub.docker.com/r/shashanksakhala/nexar_api
+
+Pull Command:
+docker pull shashanksakhala/nexar_api:latest

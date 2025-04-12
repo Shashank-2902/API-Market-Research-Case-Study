@@ -1,0 +1,10 @@
+step 1:
+build docker image command: docker build -t <docker_user_id>/<docker_repository_name>:<tag> . 
+e.g. (docker build -t shashanksakhala/nexar_api:latest .)
+
+step 2:
+Run docker command: docker run -it --rm -v "your_folder_location":/app/output <docker_user_id>/<docker_repository_name>:<tag>
+e.g.(docker run -it --rm -v "C:\Users\shash\OneDrive\Desktop\New_folder_2\docker\output":/app/output shashanksakhala/nexar_api:latest)
+
+step 3:
+download and run application via dockerhub using command: docker run your_dockerhub_username/your_repository_name:tag
