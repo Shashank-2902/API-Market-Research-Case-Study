@@ -1,18 +1,25 @@
+"""Nexar API authentication."""
+
+import os
+
 import requests
 
-CLIENT_ID = 'Client_ID'
-CLIENT_SECRET = 'Client_Key'
+TOKEN_URL = "https://identity.nexar.com/connect/token"
+
 
 def get_access_token():
-    token_url = 'https://identity.nexar.com/connect/token'
-    payload = {
-        'grant_type': 'client_credentials',
-        'client_id': CLIENT_ID,
-        'client_secret': CLIENT_SECRET,
-        'scope': 'supply.domain'
-    }
-    response = requests.post(token_url, data=payload)
-    if response.status_code == 200:
-        return response.json().get('access_token')
-    else:
-        raise Exception(f"Failed to retrieve token: {response.status_code}, {response.text}")
+    """Request an access token using the NEXAR_CLIENT_ID and NEXAR_CLIENT_SECRET variables."""
+    client_id = os.getenv("NEXAR_CLIENT_ID")
+    client_secret = os.getenv("NEXAR_CLIENT_SECRET")
+    if not client_id or not client_secret:
+        raise RuntimeError("Set NEXAR_CLIENT_ID and NEXAR_CLIENT_SECRET before running.")
+
+    response = requests.post(TOKEN_URL, data={
+        "grant_type": "client_credentials",
+        "client_id": client_id,
+        "client_secret": client_secret,
+        "scope": "supply.domain",
+    })
+    if response.status_code != 200:
+        raise RuntimeError(f"Failed to retrieve token: {response.status_code}, {response.text}")
+    return response.json().get("access_token")
