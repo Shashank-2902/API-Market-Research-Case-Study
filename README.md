@@ -22,6 +22,7 @@ Deggendorf Institute of Technology, supervised by Prof. Tim Weber.
 ```
 main.py                  runs the data collection
 generic_search.py        part search against the Nexar GraphQL API
+detailed_queries.py      availability and price queries for one part
 parse_data.py            writes collected data into SQLite
 create_sql_table.py      creates the database and its tables
 shared_auth.py           Nexar API authentication
@@ -76,9 +77,7 @@ docker pull shashanksakhala/nexar_api:latest
 For a daily run, build from `Dockerfile _cronjob` instead. It starts cron and
 runs `run_scripts.sh` every day at 10:00.
 
-## Known gaps
+## Known limitations
 
-- `main.py` imports `fetch_availability` and `fetch_pricing` from
-  `detailed_queries.py`, which is not in this repository. Add that module
-  before running the pipeline.
 - The plots in `visualization.R` are written for the part with MPN `A000066`.
+- The pipeline logic was tested against mocked API responses, not the live Nexar API.
