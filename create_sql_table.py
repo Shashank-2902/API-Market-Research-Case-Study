@@ -1,10 +1,14 @@
+"""Creates the SQLite database and its tables. Run once before main.py."""
+
 import sqlite3
 
+DB_PATH = "electronic_parts.db"
+
+
 def create_database():
-    conn = sqlite3.connect("electronic_parts.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
-    # Create Parts Table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS Parts (
         mpn TEXT PRIMARY KEY,
@@ -16,7 +20,6 @@ def create_database():
     )
     """)
 
-    # Create Prices Table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS Prices (
         price_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -30,24 +33,24 @@ def create_database():
         convertedCurrency TEXT,
         convertedPrice REAL,
         mpn TEXT,
-        FOREIGN KEY (mpn) REFERENCES Sellers(mpn)
+        FOREIGN KEY (mpn) REFERENCES Parts(mpn)
     )
     """)
 
-    #Create Availabilty Table
+    # The table name keeps its original spelling to match the existing database.
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS Availabilty (
-       
-        id INTEGER PRIMARY KEY AUTOINCREMENT,  
-        date TEXT,     
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        date TEXT,
         total_availability INTEGER,
         mpn TEXT,
-        FOREIGN KEY (mpn) REFERENCES Sellers(mpn)
+        FOREIGN KEY (mpn) REFERENCES Parts(mpn)
     )
     """)
-
 
     conn.commit()
     conn.close()
 
-create_database()
+
+if __name__ == "__main__":
+    create_database()

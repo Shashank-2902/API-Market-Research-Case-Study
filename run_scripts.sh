@@ -1,10 +1,10 @@
 #!/bin/bash
+# Collect data from the API, then build the tables and plots.
+set -e
 
-# Run the Python script
 echo "Running Python script..."
 python3 /app/main.py
 
-# Run the R script
 echo "Running R script..."
 Rscript /app/visualization.R
 

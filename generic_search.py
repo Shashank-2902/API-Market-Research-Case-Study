@@ -1,50 +1,42 @@
-# generic_search.py
+"""Searches the Nexar API for the parts matching the search keyword."""
 
 import requests
+
 import shared_auth
 
-def generic_search():
-    # Authenticate
-    token = shared_auth.get_access_token()
-    api_url = 'https://api.nexar.com/graphql'
+API_URL = "https://api.nexar.com/graphql"
+SEARCH_KEYWORD = "Arduino Uno"
+RESULT_LIMIT = 1
 
-    # Define GraphQL query
-    # keyword = "Arduino Uno"  # Replace with your search term in q below
-    query = '''
-     query partSearch {
-          supSearch (
-            q: "Arduino Uno", 
-            limit: 1
-          ){
-            hits
-            results {
-              part {
-                id
-                name
-                mpn        
-                manufacturer {
-                  id
-                  name
-                }
-              }
-            }
-          }
+QUERY = """
+query partSearch {
+  supSearch(q: "%s", limit: %d) {
+    hits
+    results {
+      part {
+        id
+        name
+        mpn
+        manufacturer {
+          id
+          name
         }
-    '''
-    
-    # Set Headers Including Access Token
-    headers = {
-        'Authorization': f'Bearer {token}',
-        'Content-Type': 'application/json'
+      }
     }
-    
-    # Make the Request and Handle the Response
-    response = requests.post(api_url, json={'query': query}, headers=headers)
+  }
+}
+"""
 
 
-    if response.status_code == 200:
-        data = response.json()
-        return data['data']['supSearch']['results']
-        # print(data)
-    else:
-        raise Exception(f"GraphQL Error: {response.status_code}, {response.text}")
+def generic_search():
+    """Return the list of search results for SEARCH_KEYWORD."""
+    headers = {
+        "Authorization": f"Bearer {shared_auth.get_access_token()}",
+        "Content-Type": "application/json",
+    }
+    payload = {"query": QUERY % (SEARCH_KEYWORD, RESULT_LIMIT)}
+    response = requests.post(API_URL, json=payload, headers=headers)
+
+    if response.status_code != 200:
+        raise RuntimeError(f"GraphQL error: {response.status_code}, {response.text}")
+    return response.json()["data"]["supSearch"]["results"]

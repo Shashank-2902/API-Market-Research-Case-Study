@@ -1,46 +1,83 @@
-# 📊 API Market Research: Data Collection and Database Handling
+# API Market Research: Data Collection and Database Handling
 
-A student project exploring market dynamics of Arduino UNO components using API-based data collection, database management, and visualization tools.
+A student project that tracks price, availability and vendor offers for Arduino
+UNO components. It collects data from the Nexar API, stores it in SQLite and
+visualises it with R. The whole pipeline can run in a Docker container, once or
+on a daily schedule.
 
-## 🧠 Overview
+The project was done for the case study "Intelligent Systems in Production" at
+Deggendorf Institute of Technology, supervised by Prof. Tim Weber.
 
-This project was developed as part of the **"Intelligent Systems in Production"** case study under the supervision of **Prof. Tim Weber** at **Deggendorf Institute of Technology**.  
-It demonstrates how to collect, store, and analyze component-level data—focusing on **price trends**, **availability**, and **sales volumes**—using:
+## What it does
 
-- **Nexar API** (data collection)
-- **SQLite** (data storage)
-- **R programming** (data visualization)
-- **Docker** (containerization for deployment)
+1. Searches the Nexar API for the part (`generic_search.py`).
+2. Fetches total availability and per-seller prices for each result.
+3. Stores parts, availability and prices in SQLite, one snapshot per day
+   (`parse_data.py`).
+4. Builds HTML tables and PNG plots of prices and availability over time
+   (`visualization.R`).
 
-## 🎯 Objective
+## Project structure
 
-To provide data-driven insights for suppliers, manufacturers, and consumers by tracking:
+```
+main.py                  runs the data collection
+generic_search.py        part search against the Nexar GraphQL API
+detailed_queries.py      availability and price queries for one part
+parse_data.py            writes collected data into SQLite
+create_sql_table.py      creates the database and its tables
+shared_auth.py           Nexar API authentication
+visualization.R          tables and plots, written to output/
+run_scripts.sh           runs main.py, then visualization.R
+Dockerfile               one-off run in a container
+Dockerfile _cronjob      same image, scheduled daily at 10:00 with cron
+Dbtable.ipynb            notebook for inspecting the database
+electronic_parts.db      collected data
+```
 
-- 💰 Price trends
-- 📦 Product availability
-- 📈 Sales volumes
+The database has three tables: `Parts`, `Prices` and `Availabilty`. The last
+name keeps its original spelling so that it matches the existing database file.
 
-## 📦 Tech Stack
+## Requirements
 
-- **Python**: API integration and data parsing
-- **Nexar API**: Real-time component-level data
-- **SQLite**: Lightweight and structured storage of collected data
-- **R**: Visualization and analysis
-- **Docker**: Containerized environment setup
+- Python 3 with `requests`
+- R with DBI, RSQLite, gt, dplyr, ggplot2, viridis and gridExtra
+- A Nexar API client ID and secret (https://nexar.com)
+- Docker, if you want to run it in a container
 
-## 📌 Key Features
-
-- ✅ Automated Arduino UNO component data extraction
-- ✅ Structured database with `parts`, `price`, and `availability` tables
-- ✅ Interactive visualizations (e.g., scatter plots, trend lines)
-- ✅ Insights on vendor pricing strategies and availability dynamics
-- ✅ Reproducible and portable via Docker
-
-## 📁 Project Structure
+## Run locally
 
 ```bash
-├── db/                   # SQLite database: electronic_parts.db
-├── scripts/              # Python and R scripts
-├── Dockerfile            # Docker environment setup
-├── README.md             # Project documentation
-└── requirements.txt      # Python dependencies
+pip install -r requirements.txt
+
+export NEXAR_CLIENT_ID=your_client_id
+export NEXAR_CLIENT_SECRET=your_client_secret
+
+python create_sql_table.py     # first run only
+python main.py
+Rscript visualization.R
+```
+
+On Windows PowerShell, set the variables with `$env:NEXAR_CLIENT_ID = "..."`.
+
+## Run with Docker
+
+```bash
+docker build -t <docker_user>/nexar_api:latest .
+docker run -it --rm -e NEXAR_CLIENT_ID=... -e NEXAR_CLIENT_SECRET=... \
+  -v "/path/to/output":/app/output <docker_user>/nexar_api:latest
+```
+
+The tables and plots are written to the mounted `output` folder. A prebuilt
+image is on Docker Hub: https://hub.docker.com/r/shashanksakhala/nexar_api
+
+```bash
+docker pull shashanksakhala/nexar_api:latest
+```
+
+For a daily run, build from `Dockerfile _cronjob` instead. It starts cron and
+runs `run_scripts.sh` every day at 10:00.
+
+## Known limitations
+
+- The plots in `visualization.R` are written for the part with MPN `A000066`.
+- The pipeline logic was tested against mocked API responses, not the live Nexar API.
